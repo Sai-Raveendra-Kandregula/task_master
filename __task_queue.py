@@ -6,8 +6,6 @@ from typing import Callable, Optional
 from .__types import TaskMasterRetentionPolicy, TaskQueueItem
 from .__executor import Executor
 
-logger = logging.getLogger("uvicorn.error")
-
 class TaskQueue:
     def __init__(
         self,
@@ -62,7 +60,6 @@ class TaskQueue:
         q : TaskQueueItem
         if self.waiting is not None:
             yield self.waiting
-        # logger.info(self.__queue.queue)
         for q in list(self.__queue.queue):
             yield q
     
