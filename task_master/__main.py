@@ -56,7 +56,7 @@ class TaskMaster:
         # Append to task queue here
         if name is None:
             name = callback.__name__
-        self.__taskqueue.enqueue(callback=callback, name=name, *args, **kwargs)
+        return self.__taskqueue.enqueue(callback=callback, name=name, *args, **kwargs)
         # self.executors[0].execute(callback, *args, **kwargs)
 
     def get_queue_items(self):

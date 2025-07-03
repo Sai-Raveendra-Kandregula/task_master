@@ -42,19 +42,38 @@ class TaskQueueItem:
         self.result : str | None = None
         self.error : str | None = None
         self.run_time : float = 0.0
+        self.is_cancelled : bool = False
     
-    def setResult(self, res):
-        try:
-            self.result = json.dumps(res)
-        except:
-            self.result = json.dumps(repr(res))
+    def cancel(self):
+        """ 
+        Cancel this queue item. If the item is already running, it does nothing 
+        unless you handle `q_item.is_cancelled` in your callback. 
+        (q_item is passed to the callback as a kwarg)
+        """
+        self.is_cancelled = True
+    
+    def appendResult(self, res):
+        if self.result is None:
+            self.result = ""
+        else:
+            self.result += "\n"
+        def is_literal_type(obj):
+            literal_types = (int, float, str, bool, bytes, complex)
+            return isinstance(obj, literal_types)
+        if is_literal_type(res):
+            self.result += str(res)
+        else:
+            try:
+                self.result += json.dumps(res)
+            except:
+                self.result += json.dumps(repr(res))
     
     def setError(self, e : Exception):
         self.error = str(e)
     
     def dict(
         self,
-        state : Literal['running', 'finished', 'queued'] = 'queued'
+        state : Literal['running', 'finished', 'queued', 'cancelled'] = 'queued'
     ):
         args = []
         kwargs = {}
@@ -73,7 +92,7 @@ class TaskQueueItem:
         return {
             **self.__dict__,
             "callback" : self.callback.__name__,
-            "state" : state,
+            "state" : state if not self.is_cancelled else "cancelled",
             'args' : args,
             'kwargs' : kwargs,
         }

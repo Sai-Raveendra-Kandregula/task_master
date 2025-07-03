@@ -19,6 +19,7 @@ class Executor:
         self.oncomplete : Optional[Callable[[TaskQueueItem]]] = None
 
         self.finished : list[TaskQueueItem] = []
+        self.cancelled : list[TaskQueueItem] = []
         self.running : list[TaskQueueItem] = []
         
         self.__executor_thread = threading.Thread(target=self.executor_thread, daemon=True)
@@ -34,14 +35,19 @@ class Executor:
             self.onstart(self.tqi)
             start_time = time.time()
             try:
-                self.tqi.setResult(self.tqi.callback(*self.tqi.args, **self.tqi.kwargs, **self.dependencies))
+                res = self.tqi.callback(*self.tqi.args, **self.tqi.kwargs, **self.dependencies, q_item=self.tqi)
+                self.tqi.appendResult(res=res)
             except Exception as e:
                 self.tqi.setError(e)
             end_time = time.time()
             self.tqi.run_time = end_time - start_time
             self.oncomplete(self.tqi)
             self.running.remove(self.tqi)
-            self.finished.append(self.tqi)
+            if self.tqi.is_cancelled:
+                self.cancelled.append(self.tqi)
+            else:
+                self.finished.append(self.tqi)
+                
             
             self.onstart = None
             self.tqi = None
