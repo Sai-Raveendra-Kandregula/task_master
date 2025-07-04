@@ -59,11 +59,14 @@ class TaskMaster:
         return self.__taskqueue.enqueue(callback=callback, name=name, *args, **kwargs)
         # self.executors[0].execute(callback, *args, **kwargs)
 
+    def get_pending_items(self):
+        return self.__taskqueue.get_pending_items()
+
     def get_queue_item(self, task_id : int):
         return self.__taskqueue.get_queue_item(task_id)
 
-    def get_queue_items(self):
-        return self.__taskqueue.get_queue_items()
+    def get_all_queue_items(self):
+        return self.__taskqueue.get_all_queue_items()
 
     def get_finished_items(self):
         return self.__taskqueue.get_finished_items()

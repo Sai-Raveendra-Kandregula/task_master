@@ -65,22 +65,30 @@ class TaskQueue:
         for q in self.running:
             yield q
     
-    def get_queue_item(self, task_id : int):
-        q : TaskQueueItem
-        if self.waiting is not None and self.waiting.id == task_id:
-            return self.waiting
-        for q in list(self.__queue.queue):
-            if q.id == task_id:
-                return q
-        return None
-        
-    
-    def get_queue_items(self):
+    def get_pending_items(self):
         q : TaskQueueItem
         if self.waiting is not None:
             yield self.waiting
         for q in list(self.__queue.queue):
             yield q
+    
+    def get_all_queue_items(self):
+        q : TaskQueueItem
+        for q in list(self.get_finished_items()):
+            yield q
+        for q in list(self.get_running_items()):
+            yield q
+        if self.waiting is not None:
+            yield self.waiting
+        for q in list(self.__queue.queue):
+            yield q
+        return None
+    
+    def get_queue_item(self, task_id : int):
+        for q in self.get_all_queue_items():
+            if q.id == task_id:
+                return q
+        return None
     
     def __del__(self):
         self.__dequeue_thread_running = False
