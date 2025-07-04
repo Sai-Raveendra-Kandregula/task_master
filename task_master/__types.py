@@ -53,6 +53,8 @@ class TaskQueueItem:
         self.is_cancelled = True
     
     def appendResult(self, res):
+        if res is None:
+            return
         if self.result is None:
             self.result = ""
         else:
