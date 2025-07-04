@@ -59,23 +59,27 @@ class TaskMaster:
         return self.__taskqueue.enqueue(callback=callback, name=name, *args, **kwargs)
         # self.executors[0].execute(callback, *args, **kwargs)
 
+    def get_queue_item(self, task_id : int):
+        return self.__taskqueue.get_queue_item(task_id)
+
     def get_queue_items(self):
         return self.__taskqueue.get_queue_items()
 
     def get_finished_items(self):
-        for exec in self.executors:
-            finished = [*exec.finished]
-            finished.reverse()
-            for q in finished:
-                yield q
+        return self.__taskqueue.get_finished_items()
+        # for exec in self.executors:
+        #     finished = [*exec.finished]
+        #     finished.reverse()
+        #     for q in finished:
+        #         yield q
 
     def get_running_items(self):
-        for exec in self.executors:
-            running = [*exec.running]
-            running.reverse()
-            for q in running:
-                yield q
-        # return self.__taskqueue.get_running_items()
+        return self.__taskqueue.get_running_items()
+        # for exec in self.executors:
+        #     running = [*exec.running]
+        #     running.reverse()
+        #     for q in running:
+        #         yield q
 
     def __del__(self):
         del self.__taskqueue

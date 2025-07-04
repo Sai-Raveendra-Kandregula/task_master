@@ -65,6 +65,16 @@ class TaskQueue:
         for q in self.running:
             yield q
     
+    def get_queue_item(self, task_id : int):
+        q : TaskQueueItem
+        if self.waiting is not None and self.waiting.id == task_id:
+            return self.waiting
+        for q in list(self.__queue.queue):
+            if q.id == task_id:
+                return q
+        return None
+        
+    
     def get_queue_items(self):
         q : TaskQueueItem
         if self.waiting is not None:
